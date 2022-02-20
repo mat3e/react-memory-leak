@@ -25,17 +25,22 @@ function random() {
 }
 
 function Character({ id = 1 }) {
-  const [{ name, image }, setData] = useState({
-    name: 'loading...',
-    image: null
-  });
-  useEffect(() => getCharacter(id).then(json => setTimeout(() => setData(json), 1000)), [id]);
+  const [data, setData] = useState(getData());
+  useEffect(() => getCharacter(id).then(json => setTimeout(() => setData([json]), 1000)), [id]);
   return (
     <figure>
-      {image && <img src={image} alt={name}/>}
-      <figcaption>{name}</figcaption>
+      {data[0].image && <img src={data[0].image} alt={data[0].name}/>}
+      <figcaption>{data[0].name}</figcaption>
     </figure>
   );
+}
+
+function getData() {
+  // WARNING: we generate a big array here, but use just its first element
+  return new Array(999999).fill(null).map(() => ({
+    name: 'loading...',
+    image: null
+  }));
 }
 
 const API_URL = 'https://rickandmortyapi.com/api/character';
