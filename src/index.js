@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useMountSubscription } from "./useMountSubscription";
+import { fromFetch } from "rxjs/fetch";
+import { switchMap } from "rxjs/operators";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -26,7 +29,7 @@ function random() {
 
 function Character({ id = 1 }) {
   const [data, setData] = useState(getData());
-  useEffect(() => getCharacter(id).then(json => setData([json])), [id]);
+  useMountSubscription(() => getCharacter(id).subscribe(json => setData([json])), [id]);
   return (
     <figure>
       {data[0].image && <img src={data[0].image} alt={data[0].name}/>}
@@ -45,6 +48,6 @@ function getData() {
 
 const API_URL = 'http://localhost:9999';
 
-async function getCharacter(id = 1) {
-  return fetch(`${API_URL}/${id}`).then(response => response.json());
+function getCharacter(id = 1) {
+  return fromFetch(`${API_URL}/${id}`).pipe(switchMap(response => response.json()));
 }
